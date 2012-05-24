@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Jeremy Lin Stats</title>
+
+    <style>
+    .game { float:left; }
+    </style>
+  </head>
+
+  <body>
+      
+    <div class="game" id="game[1]"></div>
+    
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="raphael-min.js"></script>
+    <script type="text/javascript" src="shots.js"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+    
+      var game1 = Raphael("game[1]", 450, 425)
+
+      function draw_shots( canvas, shots, qtr, game ) {
+        items = []
+        canvas.rect(0,0,450,425).attr({"fill":"brown"})
+        
+        canvas.path( 
+          "M25 12L25 413" + // draw left oob line
+          "M25 40L170 40" + // draw straight 3 pt line up top
+          "M25 385L170 385" + // draw straight 3pt line down below
+          
+          "M0 212L262 212" +
+          "M170 40" + // move to the end of the straight portion of the 3pt line
+          "A 385 262 0 0 1 170 385" // draw arc
+            
+        ).attr({ "stroke-width": 4, "stroke":"white"})
+        
+        $.each(shots, function(key, val) {
+          //console.log(val.qtr + " "+ val.id.indexOf("320204018"))
+          if ((qtr == null || val.qtr == qtr) && (game == null || val.id.indexOf(game) == 0)) {
+            var trueX,
+                trueY
+            items.push(key + ':' + val)
+            if (val.y>50)
+              trueX = (101-val.y) * 8 - 25 + 25
+            else
+              trueX = val.y * 8 - 25 + 25
+            if (val.y > 50)
+              trueY = (51 - val.x) * 8.5 - 12
+            else
+              trueY = val.x * 8.5 - 12
+                
+            var draw_obj
+            if (val.made == "true")
+              draw_obj = canvas.circle( trueX , trueY, 12).attr({"stroke": "white", "stroke-width": 3, "fill":"blue"})
+            else {
+              draw_obj = canvas.path( 
+                "M" + (trueX - 15) + " " + (trueY - 15) + 
+                "L" + (trueX + 15) + " " + (trueY + 15) +
+                "M" + (trueX + 15) + " " + (trueY - 15) + 
+                "L" + (trueX - 15) + " " + (trueY + 15)
+              ).attr({ "stroke-width": 8, "stroke":"white"})
+
+              draw_obj = canvas.path( 
+                "M" + (trueX - 12) + " " + (trueY - 12) + 
+                "L" + (trueX + 12) + " " + (trueY + 12) +
+                "M" + (trueX + 12) + " " + (trueY - 12) + 
+                "L" + (trueX - 12) + " " + (trueY + 12)
+              ).attr({ "stroke-width": 3, "stroke":"red"})
+            }
+          }
+        })
+      }
+      
+      $(document).ready(function() {
+        game_id = null;//"320206018";               
+        draw_shots(game1, shots, null, game_id)
+      })
+    </script>
+  </body>
+</html>
